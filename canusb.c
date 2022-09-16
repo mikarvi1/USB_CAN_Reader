@@ -414,12 +414,15 @@ static int inject_data_frame(int tty_fd, const char *hex_id, const char *hex_dat
 }
 
 
+#define CAN_OFFSET_BYTE 0x2
 
 static void dump_data_frames(int tty_fd)
 {
   int i, frame_len;
   unsigned char frame[32];
   struct timespec ts;
+  static int start_track=0;
+  static int skip_frame=0;
 
   while (program_running) {
     frame_len = frame_recv(tty_fd, frame, sizeof(frame));
@@ -428,13 +431,12 @@ static void dump_data_frames(int tty_fd)
       break;
 
     clock_gettime(CLOCK_MONOTONIC, &ts);
-    printf("%lu.%06lu ", ts.tv_sec, ts.tv_nsec / 1000);
 
     if (frame_len == -1) {
       printf("Frame recieve error!\n");
 
     } else {
-
+#if 0
       if ((frame_len >= 6) &&
           (frame[0] == 0xaa) &&
           ((frame[1] >> 4) == 0xc)) {
@@ -445,12 +447,50 @@ static void dump_data_frames(int tty_fd)
         printf("\n");
 
       } else {
-        printf("Unknown: ");
+#endif
+    	printf("%lu.%06lu ", ts.tv_sec, ts.tv_nsec / 1000);
+        printf("UN: 0x%02x l=%d ",frame[CAN_OFFSET_BYTE],frame_len);
+        for (i = frame_len; i > 0; i--) {
+          printf("[%d]%02x ",i, frame[i]);
+	}
+	printf("\n");
+	if (frame[CAN_OFFSET_BYTE]==0xff) {
+		//reset/start the track
+		start_track=1;
+		skip_frame=13;
+        	printf("\nT1: ");
+	} else if ((start_track) && (frame[CAN_OFFSET_BYTE]==0x00)) {
+		//if not the first byte tracking skip frame
+        	printf("\nT2: ");
+		if (start_track == 0x7)
+			start_track |= 0x8;
+		else
+			start_track |= 0x2;
+	} else if (frame[CAN_OFFSET_BYTE] == 0x3d && start_track == 0x3) {
+        	printf("\nT3: ");
+		start_track |= 0x4;
+	} else if (start_track == 0xf) {
+		skip_frame--;
+        	printf("\nT4: ");
+		if (skip_frame == 0) {
+			//Stop tracking and print/publish battery
+			start_track = 0;
+			printf("\n\n>>>>>>Battery percentage is 0x%02x, %d\n\n", frame[CAN_OFFSET_BYTE], frame[CAN_OFFSET_BYTE]);
+			//publish battery percentage
+		}
+	} else {
+		start_track = 0;
+	}
+
+
+	
+#if 0
         for (i = 0; i <= frame_len; i++) {
           printf("%02x ", frame[i]);
         }
         printf("\n");
       }
+#endif
     }
 
     if (terminate_after && (--terminate_after == 0))
