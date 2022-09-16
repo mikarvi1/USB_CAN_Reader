@@ -414,7 +414,7 @@ static int inject_data_frame(int tty_fd, const char *hex_id, const char *hex_dat
 }
 
 
-#define CAN_OFFSET_BYTE 0x2
+#define CAN_OFFSET_BYTE 0x0
 
 static void dump_data_frames(int tty_fd)
 {
