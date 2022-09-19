@@ -454,10 +454,10 @@ static void dump_data_frames(int tty_fd)
           printf("[%d]%02x ",i, frame[i]);
 	}
 	printf("\n");
-	if (frame[CAN_OFFSET_BYTE]==0xff) {
+	if ((frame[CAN_OFFSET_BYTE]==0xff) && (start_track=0)){
 		//reset/start the track
 		start_track=1;
-		skip_frame=13;
+		skip_frame=14;
         	printf("\nT1: ");
 	} else if ((start_track) && (frame[CAN_OFFSET_BYTE]==0x00)) {
 		//if not the first byte tracking skip frame
