@@ -449,11 +449,11 @@ static void dump_data_frames(int tty_fd)
       } else {
 #endif
     	printf("%lu.%06lu ", ts.tv_sec, ts.tv_nsec / 1000);
-        printf("UN: 0x%02x l=%d ",frame[CAN_OFFSET_BYTE],frame_len);
-        for (i = frame_len; i > 0; i--) {
+        printf("UN: 0x%02x l=%d \n",frame[CAN_OFFSET_BYTE],frame_len);
+        for (i = frame_len-1; i >= 0; i--) {
           printf("[%d]%02x ",i, frame[i]);
 	}
-	printf("\n");
+	printf("Tracker Status = [%d] \n", start_track);
 	if ((frame[CAN_OFFSET_BYTE]==0xff) && (start_track=0)){
 		//reset/start the track
 		start_track=1;
