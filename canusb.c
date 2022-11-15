@@ -448,18 +448,19 @@ static void dump_data_frames(int tty_fd)
 
       } else {
 #endif
+	/*This is to track the ff 00 3d 00 +14 SOC byte from the brokern UN Frames */
     	printf("%lu.%06lu ", ts.tv_sec, ts.tv_nsec / 1000);
         printf("UN: 0x%02x l=%d \n",frame[CAN_OFFSET_BYTE],frame_len);
         for (i = frame_len-1; i >= 0; i--) {
           printf("[%d]%02x ",i, frame[i]);
 	}
 	printf("Tracker Status = [%d] \n", start_track);
-	if ((frame[CAN_OFFSET_BYTE]==0xff) && (start_track=0)){
+	if ((frame[CAN_OFFSET_BYTE]==0xff) && (start_track==0)){
 		//reset/start the track
 		start_track=1;
 		skip_frame=14;
         	printf("\nT1: ");
-	} else if ((start_track) && (frame[CAN_OFFSET_BYTE]==0x00)) {
+	} else if ((start_track & 0x3) && (frame[CAN_OFFSET_BYTE]==0x00)) {
 		//if not the first byte tracking skip frame
         	printf("\nT2: ");
 		if (start_track == 0x7)
