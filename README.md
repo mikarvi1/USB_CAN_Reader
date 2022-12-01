@@ -1,5 +1,50 @@
 # USB-CAN Analyzer Linux Support
 
+
+
+# For ROS Compatibiity
+
+1)Install USB rules to get the tty right
+========================================
+Copy the local rules in the folder to the /lib/udev/rules.d
+and replug the battery_can or USB_CAN device physically to the board
+
+$cp 10-local.rules /lib/udev/rules.d/
+$cd /lib/udev/rules.d/
+
+TEST@ubuntu:/lib/udev/rules.d$ ls
+10-local.rules                          60-persistent-input.rules              73-special-net-names.rules         80-iio-sensor-proxy.rules
+39-usbmuxd.rules                        60-persistent-storage-dm.rules         75-net-description.rules           80-libinput-device-groups.rules
+40-usb-media-players.rules              60-persistent-storage.rules            75-probe_mtd.rules                 80-mm-candidate.rules
+
+This mounts the USB as /dev/battery symlink
+
+Now we are ready to build an run
+
+2) Build and run
+================
+  cd to build folder and build
+  
+  $cd build
+  $cmake ..
+  $make
+  
+  you should get the following
+  
+TEST@ubuntu:~/USB_CAN_Reader/build$ make 
+Scanning dependencies of target battery_can_node
+[ 50%] Building CXX object CMakeFiles/battery_can_node.dir/src/battery_can_node.cpp.o
+[100%] Linking CXX executable devel/lib/battery/battery_can_node
+[100%] Built target battery_can_node
+
+
+To run the binary run
+$./devel/lib/battery/battery_can_node
+
+
+
+The regular CANUSB.c is removed but the readme is kept for reference
+  
 This is a small C program that dumps the CAN traffic for one these adapters:
 ![alt text](USB-CAN.jpg)
 
