@@ -1,0 +1,4 @@
+<launch>
+    <node name="battery_can_node" pkg="battery" type="battery_can_node" output="screen" respawn="True">
+    </node>
+</launch>
