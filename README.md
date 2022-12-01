@@ -21,7 +21,7 @@ This mounts the USB as /dev/battery symlink
 
 Now we are ready to build an run
 
-2) Build and run
+2)Build and run
 ================
   cd to build folder and build
   
